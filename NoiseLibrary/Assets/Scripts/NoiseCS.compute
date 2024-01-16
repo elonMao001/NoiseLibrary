@@ -1,0 +1,15 @@
+
+#pragma kernel RegularNoise
+
+#include "Packages/jp.keijiro.noiseshader/Shader/SimplexNoise2D.hlsl"
+
+RWTexture2D<float4> NoiseTexture;
+float amplitude;
+float frequency;
+float2 centre;
+
+[numthreads(8,8,1)]
+void RegularNoise (uint2 id : SV_DispatchThreadID) {
+    
+    NoiseTexture[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+}
