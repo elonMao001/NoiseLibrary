@@ -17,6 +17,12 @@ public class NoiseRenderer : MonoBehaviour {
     [SerializeField]
     private RenderTexture noiseTexture;
 
+    private enum NoiseType {
+        Regular, Layered
+    }
+    [SerializeField]
+    private NoiseType noiseType;
+
     [SerializeField, Min(1)]
     private int resolution = 1;
 
@@ -40,8 +46,9 @@ public class NoiseRenderer : MonoBehaviour {
 
     private void Init() {
         float aspect = meshRenderer.transform.localScale.y / meshRenderer.transform.localScale.x;
+        int resolutionY = (int)Max(resolution * aspect, 1);
 
-        noiseTexture = new RenderTexture(resolution, (int)Max(resolution * aspect, 1), 1) {
+        noiseTexture = new RenderTexture(resolution, resolutionY, 1) {
             enableRandomWrite = true,
             filterMode = FilterMode.Point
         };
@@ -49,11 +56,15 @@ public class NoiseRenderer : MonoBehaviour {
         noiseTexture.Create();
         meshRenderer.sharedMaterial.mainTexture = noiseTexture;
 
-        noiseCS.SetTexture(0, "NoiseTexture", noiseTexture);
+        noiseCS.SetInt("resolution", resolution);
+        noiseCS.SetFloats("centre", resolution / 2f, resolutionY / 2f);
     }
 
     private void UpdateNoiseCS() {
-        noiseCS.Dispatch(0, CeilToInt(noiseTexture.width / 8f), CeilToInt(noiseTexture.height / 8f), 1);
+        noiseCS.SetFloat("amplitude", noiseSettings.amplitude);
+        noiseCS.SetFloat("frequency", noiseSettings.frequency);
+        noiseCS.SetTexture((int)noiseType, "NoiseTexture", noiseTexture);
+        noiseCS.Dispatch((int)noiseType, CeilToInt(noiseTexture.width / 8f), CeilToInt(noiseTexture.height / 8f), 1);
     }
 
     private void OnValidate() => validated = true;

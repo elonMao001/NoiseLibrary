@@ -176,7 +176,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 4.488232
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -239,7 +239,8 @@ MonoBehaviour:
   noiseSettings: {fileID: 11400000, guid: 18c5b0a0bf5c9414e81edd46d137c0fd, type: 2}
   noiseCS: {fileID: 7200000, guid: 9fec32a1cbaf49e4a96c43427dd616dd, type: 3}
   noiseTexture: {fileID: 0}
-  resolution: 21
+  noiseType: 0
+  resolution: 84
 --- !u!4 &651592091
 Transform:
   m_ObjectHideFlags: 0
@@ -248,7 +249,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 651592089}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.03891009, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -324,7 +325,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 4b199cca2c2d2554ba027606781e0abc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

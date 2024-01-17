@@ -6,4 +6,5 @@ using UnityEngine;
 public class NoiseSettings : ScriptableObject {
     [Header("Noise Settings")]
     public float amplitude = 0;
+    public float frequency = 0;
 }
