@@ -1,33 +1,89 @@
 
-#pragma kernel RegularNoise
-#pragma kernel LayeredNoise
+#pragma kernel NoiseGenerator
 
 #include "Packages/jp.keijiro.noiseshader/Shader/SimplexNoise2D.hlsl"
+#include "Packages/jp.keijiro.noiseshader/Shader/SimplexNoise3D.hlsl"
 
 #define THREAD_COUNT 16
 
 struct NoiseLayer {
-    float amplitude, frequency;
+    float amplitude, frequency, zoffset;
 };
 
-RWTexture2D<float4> NoiseTexture;
-float amplitude;
-float frequency;
-int resolution;
-float2 centre;
+float LayeredNoise(float3 pos, float3 offset, RWStructuredBuffer<NoiseLayer> noiseLayers) {
+    float noiseValue = 0;
 
-[numthreads(THREAD_COUNT, THREAD_COUNT, 1)]
-void RegularNoise(uint2 id : SV_DispatchThreadID) {
-    float2 pos = (float2)(centre - id) / resolution;
+    for (int i = 0; i < noiseLayers.length; i++) {
+        NoiseLayer noiseLayer = NoiseLayerBuffer[i];
 
-    NoiseTexture[id.xy] = SimplexNoise(float2(pos.x * frequency, pos.y * frequency)) * amplitude * 0.5 + 0.5;
+        float2 currentPos = pos * noiseLayer.frequency;
+        noiseValue += SimplexNoise(float3(pos.x + offset.x, pos.y + offset.y, noiseLayer.zoffset + offset.z)) * noiseLayer.amplitude;
+    }
 }
 
-RWStructuredBuffer<NoiseLayer> noiseLayers;
+RWTexture2D<float4> NoiseTexture;
+RWStructuredBuffer<NoiseLayer> NoiseLayerBuffer;
+
+int resolution;
+float2 centre;
+float3 offset;
+
+float base_amplitude;
+float base_frequency;
+float base_maxNoiseValue;
+float base_steepness;
+float base_noiseValueOffset;
+
+[numthreads(THREAD_COUNT, THREAD_COUNT, 1)]
+void NoiseGenerator(uint2 id : SV_DISPATCHTHREADID) {
+    float2 pos = (float2)(centre - id) / resolution;
+    float noiseValue = LayeredNoise(pos, NoiseLayerBuffer);
+
+    NoiseTexture[id.xy] = (0.5 + 0.5 * value / maxNoiseValue) * amplitude;
+}
+
+/*
+[numthreads(THREAD_COUNT, THREAD_COUNT, 1)]
+void RegularNoise(uint2 id : SV_DispatchThreadID) {
+    float2 pos = (float2)(centre - id) / resolution * frequency;
+    
+    NoiseTexture[id.xy] = SimplexNoise(float3(pos.x + offset.x, pos.y + offset.y, offset.z)) * amplitude * 0.5 + 0.5;
+}
 
 [numthreads(THREAD_COUNT, THREAD_COUNT, 1)]
 void LayeredNoise(uint2 id : SV_DispatchThreadID) {
-    float2 pos = (float2)(centre - id) / resolution;
+    float2 pos0 = (float2)(centre - id) / resolution;
+    float value = 0;
 
-    NoiseTexture[id.xy] = SimplexNoise(float2(pos.x * frequency, pos.y * frequency)) * amplitude * 0.5 + 0.5;
+    for (int i = 0; i < noiseLayers; i++) {
+        NoiseLayer noiseLayer = NoiseLayerBuffer[i];
+
+        float2 pos = pos0 * noiseLayer.frequency;
+        value += SimplexNoise(float3(pos.x + offset.x, pos.y + offset.y, noiseLayer.zoffset + offset.z)) * noiseLayer.amplitude;
+    }
+
+    NoiseTexture[id.xy] = (0.5 + 0.5 * value / maxNoiseValue) * amplitude;
 }
+
+[numthreads(THREAD_COUNT, THREAD_COUNT, 1)]
+void RigidNoise(uint2 id : SV_DispatchThreadID) {
+    float2 pos0 = (float2)(centre - id) / resolution;
+    float value = 0;
+    float weight = 1;
+
+    for (int i = 0; i < noiseLayers; i++) {
+        NoiseLayer noiseLayer = NoiseLayerBuffer[i];
+
+        float2 pos = pos0 * noiseLayer.frequency;
+        float currentValue = 1 - abs(SimplexNoise(float3(pos.x + offset.x, pos.y + offset.y, noiseLayer.zoffset + offset.z)));
+        
+        //currentValue *= weight;
+        currentValue = pow(currentValue, steepness);
+        //weight = currentValue;
+
+        value += currentValue * noiseLayer.amplitude;
+    }
+
+    NoiseTexture[id.xy] = (0.5 + 0.5 * value / maxNoiseValue + noiseValueOffset) * amplitude;
+}
+*/

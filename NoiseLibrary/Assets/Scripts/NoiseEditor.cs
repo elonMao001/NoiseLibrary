@@ -10,7 +10,7 @@ public class NoiseEditor : Editor {
     public override void OnInspectorGUI() {
         base.OnInspectorGUI();
         
-        DrawSettingsEditor(noiseRenderer.noiseSettings, noiseRenderer.OnNoiseSettingsUpdated);
+        DrawSettingsEditor(noiseRenderer.settings, noiseRenderer.OnNoiseSettingsUpdated);
     }
 
     private void DrawSettingsEditor(Object settings, System.Action onSettingsUpdated) {

@@ -1,32 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Unity.VisualScripting;
 using UnityEngine;
 
 using static UnityEngine.Mathf;
 
 public class NoiseRenderer : MonoBehaviour {
-    private MeshRenderer meshRenderer;
-    
-    public NoiseSettings noiseSettings;
 
+    [Header("General")]
+    private MeshRenderer meshRenderer;
     [SerializeField]
     private ComputeShader noiseCS;
-    private ComputeBuffer noiseBuffer;
+    private INoiseUpdater noiseUpdater;
 
     [SerializeField]
     private RenderTexture noiseTexture;
-
-    private enum NoiseType {
-        Regular, Layered
-    }
-    [SerializeField]
-    private NoiseType noiseType;
 
     [SerializeField, Min(1)]
     private int resolution = 1;
 
     private bool validated;
+
+    [SerializeField]
+    private bool active;
+    
+    public Settings settings;
 
     private void Start() {
         meshRenderer = GetComponentInChildren<MeshRenderer>();
@@ -35,6 +34,7 @@ public class NoiseRenderer : MonoBehaviour {
         UpdateNoiseCS();
     }
 
+
     private void Update() {
         if (validated) {
             Init();
@@ -42,6 +42,12 @@ public class NoiseRenderer : MonoBehaviour {
 
             validated = false;
         }
+        /*
+        if (active) {
+            noiseSettings.offset.z += noiseSettings.rateOfChange;
+            UpdateNoiseCS();
+        }
+        */
     }
 
     private void Init() {
@@ -61,15 +67,25 @@ public class NoiseRenderer : MonoBehaviour {
     }
 
     private void UpdateNoiseCS() {
-        noiseCS.SetFloat("amplitude", noiseSettings.amplitude);
-        noiseCS.SetFloat("frequency", noiseSettings.frequency);
-        noiseCS.SetTexture((int)noiseType, "NoiseTexture", noiseTexture);
-        noiseCS.Dispatch((int)noiseType, CeilToInt(noiseTexture.width / 8f), CeilToInt(noiseTexture.height / 8f), 1);
+        if (noiseUpdater != null) 
+            noiseUpdater.Dispose();
+        (noiseUpdater = NoiseUpdaterFactory.CreateNoiseUpdater(settings.noiseSettings)).UpdateCS(noiseCS, "base_");
+
+        noiseCS.SetVector("offset", settings.offset);
+        noiseCS.SetTexture(0, "NoiseTexture", noiseTexture);
+
+        noiseCS.Dispatch(0, CeilToInt(noiseTexture.width / 16f), CeilToInt(noiseTexture.height / 16f), 1);
     }
 
     private void OnValidate() => validated = true;
 
     public void OnNoiseSettingsUpdated() {
+        settings.DetermineNoiseSettings();
+
         UpdateNoiseCS();
+    }
+
+    public void OnDisable() {
+
     }
 }

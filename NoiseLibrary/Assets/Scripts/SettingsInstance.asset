@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2c62281d6385b54baa40edfb39ddfab, type: 3}
+  m_Name: SettingsInstance
+  m_EditorClassIdentifier: 
+  noiseType: 0
+  offset: {x: -15.72, y: 9.67, z: 98.06604}
+  rateOfChange: 1.21
+  noiseSettings:
+    rid: 9134762824675622918
+  regularNoiseSettings:
+    amplitude: 1
+    frequency: 16.1
+    persistence: 0.5
+    lacunarity: 2
+    layers: 1
+  rigidNoiseSettings:
+    amplitude: 2.05
+    frequency: 15.31
+    persistence: 0.5
+    lacunarity: 1.6
+    layers: 8
+    steepness: 1
+    noiseValueOffset: -0.54
+  references:
+    version: 2
+    RefIds:
+    - rid: 9134762824675622918
+      type: {class: Settings/RegularNoiseSettings, ns: , asm: Assembly-CSharp}
+      data:
+        amplitude: 1
+        frequency: 16.1
+        persistence: 0.5
+        lacunarity: 2
+        layers: 1

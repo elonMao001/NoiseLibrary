@@ -236,11 +236,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9d9e6ca5975c004a9d296bc0dfd78db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  noiseSettings: {fileID: 11400000, guid: 18c5b0a0bf5c9414e81edd46d137c0fd, type: 2}
   noiseCS: {fileID: 7200000, guid: 9fec32a1cbaf49e4a96c43427dd616dd, type: 3}
   noiseTexture: {fileID: 0}
-  noiseType: 0
-  resolution: 84
+  resolution: 3000
+  active: 0
+  settings: {fileID: 11400000, guid: 18c5b0a0bf5c9414e81edd46d137c0fd, type: 2}
 --- !u!4 &651592091
 Transform:
   m_ObjectHideFlags: 0
